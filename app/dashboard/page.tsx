@@ -30,7 +30,7 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col bg-civic-mist">
       <AppHeader />
-      <main className="mx-auto grid w-full max-w-7xl flex-1 gap-5 px-6 py-6 lg:grid-cols-3">
+      <main className="mx-auto grid w-full max-w-7xl flex-1 gap-5 px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
           <SummaryCards snapshot={snapshot} derived={derived} stageKey={stageIndex} />
 

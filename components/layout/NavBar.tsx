@@ -15,7 +15,7 @@ export function NavBar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-ink px-6 py-3.5 text-white">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-ink px-4 py-3 text-white md:px-6 md:py-3.5">
       <Link href="/" className="group flex items-center gap-3 transition-smooth">
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal text-white transition-smooth group-hover:scale-105 group-hover:brightness-110">
           <ShieldCheck size={18} />

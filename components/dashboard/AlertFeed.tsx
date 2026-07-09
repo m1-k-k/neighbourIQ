@@ -14,7 +14,7 @@ export function AlertFeed({ alerts, stageKey }: { alerts: AlertFeedItem[]; stage
   const sorted = [...alerts].reverse();
 
   return (
-    <Card className="sticky top-[9.5rem] p-5">
+    <Card className="p-5 lg:sticky lg:top-[9.5rem]">
       <div className="mb-4 flex items-center justify-between gap-2">
         <p className="font-display text-lg font-semibold text-ink">Live proof</p>
         <span

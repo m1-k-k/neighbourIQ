@@ -16,31 +16,33 @@ export function ScenarioControls() {
   }, [stageIndex]);
 
   return (
-    <div className="border-b border-border bg-surface px-6 py-4 shadow-[0_4px_20px_rgba(11,31,42,0.06)]">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
+    <div className="border-b border-border bg-surface px-4 py-3 shadow-[0_4px_20px_rgba(11,31,42,0.06)] md:px-6 md:py-4">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 md:gap-4">
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted">
+          <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted sm:gap-2 sm:text-[11px]">
             <span className="rounded bg-teal-muted px-1.5 py-0.5 text-teal">Demo story</span>
-            <span className="text-border">·</span>
+            <span className="hidden text-border sm:inline">·</span>
             <span key={`time-${stageIndex}`} className="animate-stage-swap">
               {snapshot.stage.timeLabel}
             </span>
             <span className="text-border">·</span>
             <span>
-              Stage {stageIndex + 1} of {totalStages}
+              Stage {stageIndex + 1}/{totalStages}
             </span>
           </div>
           <div key={`copy-${stageIndex}`} className="animate-stage-swap">
-            <p className="mt-1 font-display text-xl font-semibold text-ink sm:text-2xl">{snapshot.stage.label}</p>
-            <p className="mt-0.5 max-w-2xl text-sm text-muted">{snapshot.stage.description}</p>
+            <p className="mt-0.5 font-display text-lg font-semibold text-ink sm:mt-1 sm:text-xl md:text-2xl">
+              {snapshot.stage.label}
+            </p>
+            <p className="mt-0.5 hidden max-w-2xl text-sm text-muted sm:block">{snapshot.stage.description}</p>
           </div>
 
-          <div className="mt-3 flex gap-1.5" aria-hidden>
+          <div className="mt-2 flex gap-1 sm:mt-3 sm:gap-1.5" aria-hidden>
             {Array.from({ length: totalStages }).map((_, i) => (
               <span
                 key={i}
                 className={clsx(
-                  "h-1.5 flex-1 max-w-16 rounded-full transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                  "h-1 flex-1 max-w-12 rounded-full transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] sm:h-1.5 sm:max-w-16",
                   i < stageIndex ? "bg-teal" : i === stageIndex ? "animate-progress-fill bg-amber" : "bg-mist-deep"
                 )}
               />
@@ -48,7 +50,7 @@ export function ScenarioControls() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="hidden items-center gap-2.5 md:flex">
           <button
             type="button"
             data-testid="scenario-reset"
