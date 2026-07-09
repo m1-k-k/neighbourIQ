@@ -24,21 +24,21 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 export default function DashboardPage() {
-  const { snapshot, derived } = useScenario();
+  const { snapshot, derived, stageIndex } = useScenario();
   const [activeTab, setActiveTab] = useState<TabId>("flood");
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-civic-mist">
       <AppHeader />
-      <main className="mx-auto grid w-full max-w-7xl flex-1 gap-4 px-6 py-6 lg:grid-cols-3">
+      <main className="mx-auto grid w-full max-w-7xl flex-1 gap-5 px-6 py-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
-          <SummaryCards snapshot={snapshot} derived={derived} />
+          <SummaryCards snapshot={snapshot} derived={derived} stageKey={stageIndex} />
 
-          <Card className="p-4">
-            <TownMap combinedRiskByDistrict={derived.combinedRiskByDistrict} />
+          <Card key={`map-${stageIndex}`} className="animate-soft-scale-in p-5 transition-smooth">
+            <TownMap combinedRiskByDistrict={derived.combinedRiskByDistrict} stageKey={stageIndex} />
           </Card>
 
-          <div className="flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
+          <div className="flex gap-1 rounded-xl border border-border bg-surface p-1.5 shadow-sm">
             {TABS.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
@@ -46,8 +46,8 @@ export default function DashboardPage() {
                 data-testid={`tab-${id}`}
                 onClick={() => setActiveTab(id)}
                 className={clsx(
-                  "flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                  activeTab === id ? "bg-sky-600 text-white" : "text-slate-600 hover:bg-slate-100"
+                  "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-sm font-semibold transition-smooth",
+                  activeTab === id ? "bg-ink text-white shadow-sm" : "text-muted hover:bg-mist hover:text-ink"
                 )}
               >
                 <Icon size={15} /> {label}
@@ -55,20 +55,36 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          {activeTab === "flood" && (
-            <FloodRiskPanel readings={snapshot.floodReadings} predictions={derived.floodPredictions} />
-          )}
-          {activeTab === "traffic" && (
-            <TrafficPanel readings={snapshot.trafficReadings} predictions={derived.trafficPredictions} />
-          )}
-          {activeTab === "hotspots" && (
-            <HotspotPanel readings={snapshot.incidentReadings} predictions={derived.incidentPredictions} />
-          )}
-          {activeTab === "budget" && <BudgetPriorityPanel items={derived.budgetPriorities} />}
+          <div key={`${activeTab}-${stageIndex}`} className="animate-tab-panel-in">
+            {activeTab === "flood" && (
+              <FloodRiskPanel
+                readings={snapshot.floodReadings}
+                predictions={derived.floodPredictions}
+                stageKey={stageIndex}
+              />
+            )}
+            {activeTab === "traffic" && (
+              <TrafficPanel
+                readings={snapshot.trafficReadings}
+                predictions={derived.trafficPredictions}
+                stageKey={stageIndex}
+              />
+            )}
+            {activeTab === "hotspots" && (
+              <HotspotPanel
+                readings={snapshot.incidentReadings}
+                predictions={derived.incidentPredictions}
+                stageKey={stageIndex}
+              />
+            )}
+            {activeTab === "budget" && (
+              <BudgetPriorityPanel items={derived.budgetPriorities} stageKey={stageIndex} />
+            )}
+          </div>
         </div>
 
         <div className="lg:col-span-1">
-          <AlertFeed alerts={snapshot.alerts} />
+          <AlertFeed alerts={snapshot.alerts} stageKey={stageIndex} />
         </div>
       </main>
     </div>

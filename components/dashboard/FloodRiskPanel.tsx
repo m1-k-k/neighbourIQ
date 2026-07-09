@@ -13,9 +13,11 @@ import { FloodReading, Prediction } from "@/lib/types";
 export function FloodRiskPanel({
   readings,
   predictions,
+  stageKey,
 }: {
   readings: FloodReading[];
   predictions: Record<string, Prediction>;
+  stageKey?: number;
 }) {
   const topDistrictId = useMemo(
     () =>
@@ -27,35 +29,39 @@ export function FloodRiskPanel({
 
   return (
     <div className="space-y-4">
-      <Card className="p-4">
+      <Card key={`chart-${stageKey ?? 0}`} className="animate-soft-scale-in p-4">
         <RiskTrendChart focusDistrictId={topDistrictId} />
       </Card>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {readings.map((reading) => {
+        {readings.map((reading, i) => {
           const district = getDistrict(reading.districtId);
           const prediction = predictions[reading.districtId];
           return (
-            <Card key={reading.districtId} className="p-4">
+            <Card
+              key={`${reading.districtId}-${stageKey ?? 0}`}
+              className="animate-soft-scale-in p-4"
+              style={{ animationDelay: `${80 + i * 50}ms` }}
+            >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
-                    <Droplets size={14} className="text-sky-600" /> {district.name}
+                  <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+                    <Droplets size={14} className="text-teal" /> {district.name}
                   </p>
-                  <p className="text-xs text-slate-500">{district.tagline}</p>
+                  <p className="text-xs text-muted">{district.tagline}</p>
                 </div>
                 <RiskBadge level={prediction.level} />
               </div>
-              <dl className="mt-3 grid grid-cols-3 gap-2 text-xs text-slate-600">
+              <dl className="mt-3 grid grid-cols-3 gap-2 text-xs text-ink/80">
                 <div>
-                  <dt className="text-slate-400">River level</dt>
+                  <dt className="text-muted">River level</dt>
                   <dd className="font-medium">{reading.riverLevelM.toFixed(1)}m</dd>
                 </div>
                 <div>
-                  <dt className="text-slate-400">Rainfall 24h</dt>
+                  <dt className="text-muted">Rainfall 24h</dt>
                   <dd className="font-medium">{reading.rainfall24hMm}mm</dd>
                 </div>
                 <div>
-                  <dt className="text-slate-400">Drainage</dt>
+                  <dt className="text-muted">Drainage</dt>
                   <dd className="font-medium">{reading.drainageCapacityPct}%</dd>
                 </div>
               </dl>

@@ -17,7 +17,7 @@ export function BudgetAllocationChart({ items }: { items: BudgetPriorityItem[] }
 
   return (
     <div>
-      <p className="mb-2 text-xs font-medium text-slate-500">Budget priority ranking (current stage)</p>
+      <p className="mb-2 text-xs font-medium text-muted">Budget priority ranking (current stage)</p>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={data} layout="vertical" margin={{ top: 8, right: 24, left: 8, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />

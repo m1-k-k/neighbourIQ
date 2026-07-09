@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { ScenarioProvider } from "@/lib/ScenarioContext";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "NeighbourIQ — AI Community Guardian",
-  description: "Predicting and preventing community problems before they happen.",
+  title: "NeighbourIQ — stop community crises before they start",
+  description:
+    "AI Community Guardian for councils: predict flood, traffic, and incident risk — and protect vulnerable residents before problems escalate.",
 };
 
 export default function RootLayout({
@@ -24,9 +28,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-slate-100 text-slate-900">
+    <html lang="en" className={`${fraunces.variable} ${jakarta.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col bg-mist font-sans text-ink">
         <ScenarioProvider>{children}</ScenarioProvider>
+        <Analytics />
       </body>
     </html>
   );

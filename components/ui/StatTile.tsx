@@ -14,16 +14,22 @@ export function StatTile({
   icon?: LucideIcon;
 }) {
   return (
-    <Card className="flex items-start gap-3 p-4">
+    <Card className="hover-lift flex items-start gap-3 p-4 hover:shadow-md">
       {Icon && (
-        <div className="rounded-lg bg-slate-100 p-2 text-slate-500">
+        <div className="rounded-lg bg-teal-muted p-2 text-teal transition-smooth">
           <Icon size={18} />
         </div>
       )}
       <div className="min-w-0">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
-        <p className="truncate text-xl font-semibold text-slate-900">{value}</p>
-        {sub && <p className="mt-0.5 truncate text-xs text-slate-500">{sub}</p>}
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">{label}</p>
+        <p key={String(value)} className="animate-value-tick truncate font-display text-xl font-semibold text-ink">
+          {value}
+        </p>
+        {sub && (
+          <p key={sub} className="animate-value-tick mt-0.5 truncate text-xs text-muted" style={{ animationDelay: "60ms" }}>
+            {sub}
+          </p>
+        )}
       </div>
     </Card>
   );

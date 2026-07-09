@@ -10,37 +10,43 @@ import { IncidentReading, Prediction } from "@/lib/types";
 export function HotspotPanel({
   readings,
   predictions,
+  stageKey,
 }: {
   readings: IncidentReading[];
   predictions: Record<string, Prediction>;
+  stageKey?: number;
 }) {
   return (
     <div className="space-y-4">
-      <Card className="p-4">
+      <Card key={`chart-${stageKey ?? 0}`} className="animate-soft-scale-in p-4">
         <IncidentTrendChart predictions={predictions} />
       </Card>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {readings.map((reading) => {
+        {readings.map((reading, i) => {
           const district = getDistrict(reading.districtId);
           const prediction = predictions[reading.districtId];
           return (
-            <Card key={reading.districtId} className="p-4">
+            <Card
+              key={`${reading.districtId}-${stageKey ?? 0}`}
+              className="animate-soft-scale-in p-4"
+              style={{ animationDelay: `${80 + i * 50}ms` }}
+            >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
-                    <AlertTriangle size={14} className="text-sky-600" /> {district.name}
+                  <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+                    <AlertTriangle size={14} className="text-teal" /> {district.name}
                   </p>
-                  <p className="text-xs text-slate-500">{reading.category}</p>
+                  <p className="text-xs text-muted">{reading.category}</p>
                 </div>
                 <RiskBadge level={prediction.level} />
               </div>
-              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-600">
+              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs text-ink/80">
                 <div>
-                  <dt className="text-slate-400">Reports (3h)</dt>
+                  <dt className="text-muted">Reports (3h)</dt>
                   <dd className="font-medium">{reading.recentReportCount}</dd>
                 </div>
                 <div>
-                  <dt className="text-slate-400">Trend</dt>
+                  <dt className="text-muted">Trend</dt>
                   <dd className="font-medium capitalize">{reading.trendDirection}</dd>
                 </div>
               </dl>

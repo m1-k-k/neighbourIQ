@@ -17,7 +17,7 @@ export function IncidentTrendChart({ predictions }: { predictions: Record<string
 
   return (
     <div>
-      <p className="mb-2 text-xs font-medium text-slate-500">Incident hotspot score by district (current stage)</p>
+      <p className="mb-2 text-xs font-medium text-muted">Incident hotspot score by district (current stage)</p>
       <ResponsiveContainer width="100%" height={180}>
         <BarChart data={data} margin={{ top: 8, right: 12, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />

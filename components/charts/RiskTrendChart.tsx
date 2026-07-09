@@ -13,7 +13,7 @@ export function RiskTrendChart({ focusDistrictId }: { focusDistrictId: string })
 
   return (
     <div>
-      <p className="mb-2 text-xs font-medium text-slate-500">Flood risk trend — {district.name}</p>
+      <p className="mb-2 text-xs font-medium text-muted">Flood risk trend — {district.name}</p>
       <ResponsiveContainer width="100%" height={180}>
         <LineChart data={data} margin={{ top: 8, right: 12, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />

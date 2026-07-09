@@ -16,7 +16,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) locally, or the live demo at [https://cisco-livid.vercel.app](https://cisco-livid.vercel.app).
 
 - **Council Dashboard** — `/dashboard`
 - **Resident View** — `/resident`
@@ -31,3 +31,15 @@ Use the scenario controls in the header to advance through the five-stage demo (
 | `npm run build`| Production build         |
 | `npm run start`| Serve production build   |
 | `npm run lint` | Run ESLint               |
+
+## Deployment
+
+Hosted on [Vercel](https://vercel.com). Production URL: **https://cisco-livid.vercel.app**
+
+To redeploy from CLI (team `m1wav`):
+
+```bash
+npx vercel --prod --scope m1wav
+```
+
+Connect [m1-k-k/cisco](https://github.com/m1-k-k/cisco) in the [Vercel project settings](https://vercel.com/m1wav/cisco/settings/git) for automatic deploys on push.
