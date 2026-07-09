@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { MobileScenarioBar } from "@/components/layout/MobileScenarioBar";
 import { ScenarioProvider } from "@/lib/ScenarioContext";
 import "./globals.css";
 
@@ -22,6 +23,12 @@ export const metadata: Metadata = {
     "AI Community Guardian for councils: predict flood, traffic, and incident risk — and protect vulnerable residents before problems escalate.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,7 +37,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fraunces.variable} ${jakarta.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-mist font-sans text-ink">
-        <ScenarioProvider>{children}</ScenarioProvider>
+        <ScenarioProvider>
+          {children}
+          <MobileScenarioBar />
+        </ScenarioProvider>
         <Analytics />
       </body>
     </html>

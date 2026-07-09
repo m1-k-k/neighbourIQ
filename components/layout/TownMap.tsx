@@ -29,9 +29,9 @@ export const TownMap = memo(function TownMap({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between gap-2">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
         <h2 className="font-display text-lg font-semibold text-ink">Millhaven risk map</h2>
-        <p className="text-xs text-muted">District risk updates as the story advances</p>
+        <p className="min-w-0 shrink text-xs text-muted">District risk updates as the story advances</p>
       </div>
       <svg
         viewBox="0 0 800 600"

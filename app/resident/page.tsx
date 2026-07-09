@@ -12,9 +12,9 @@ export default function ResidentPage() {
   const atRisk = vulnerableResidents.filter((r) => r.alertStatus !== "none");
 
   return (
-    <div className="flex min-h-screen flex-col bg-civic-mist">
+    <div className="flex min-h-dvh min-h-screen min-w-0 flex-col overflow-x-clip bg-civic-mist">
       <AppHeader />
-      <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-6 pb-24 md:px-6 md:py-8 md:pb-8">
+      <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-6 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:px-6 md:py-8 md:pb-8">
         <div className="animate-fade-up">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-teal">People first</p>
           <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Millhaven Resident Alerts</h1>

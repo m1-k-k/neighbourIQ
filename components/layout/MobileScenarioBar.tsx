@@ -2,10 +2,14 @@
 
 import clsx from "clsx";
 import { ChevronRight, RotateCcw } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useScenario } from "@/lib/ScenarioContext";
 
+const DEMO_ROUTES = ["/dashboard", "/resident"];
+
 export function MobileScenarioBar() {
+  const pathname = usePathname();
   const { stageIndex, snapshot, advance, reset, isFinalStage } = useScenario();
   const [pulseAdvance, setPulseAdvance] = useState(false);
 
@@ -14,6 +18,8 @@ export function MobileScenarioBar() {
     const t = window.setTimeout(() => setPulseAdvance(false), 2400);
     return () => window.clearTimeout(t);
   }, [stageIndex]);
+
+  if (!DEMO_ROUTES.includes(pathname)) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 px-4 py-3 shadow-[0_-4px_20px_rgba(11,31,42,0.08)] backdrop-blur-md md:hidden pb-[max(0.75rem,env(safe-area-inset-bottom))]">

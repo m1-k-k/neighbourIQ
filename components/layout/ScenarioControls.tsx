@@ -31,7 +31,7 @@ export function ScenarioControls() {
             </span>
           </div>
           <div key={`copy-${stageIndex}`} className="animate-stage-swap">
-            <p className="mt-0.5 font-display text-lg font-semibold text-ink sm:mt-1 sm:text-xl md:text-2xl">
+            <p className="mt-0.5 hidden font-display text-lg font-semibold text-ink sm:mt-1 sm:block sm:text-xl md:text-2xl">
               {snapshot.stage.label}
             </p>
             <p className="mt-0.5 hidden max-w-2xl text-sm text-muted sm:block">{snapshot.stage.description}</p>
