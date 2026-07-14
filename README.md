@@ -36,10 +36,23 @@ Use the scenario controls in the header to advance through the five-stage demo (
 
 Hosted on [Vercel](https://vercel.com). Production URL: **https://cisco-livid.vercel.app**
 
-To redeploy from CLI (team `m1wav`):
+Source of truth is [m1-k-k/neighbourIQ](https://github.com/m1-k-k/neighbourIQ). Deploys to production run automatically via GitHub Actions (`.github/workflows/deploy.yml`) on every push to `master`:
+
+1. `npm ci`
+2. `vercel pull` / `vercel build --prod` / `vercel deploy --prebuilt --prod`
+
+This requires three repository secrets to be set under **Settings → Secrets and variables → Actions**:
+
+| Secret | Where to get it |
+|---|---|
+| `VERCEL_TOKEN` | Create at [vercel.com/account/tokens](https://vercel.com/account/tokens) |
+| `VERCEL_ORG_ID` | From `.vercel/project.json` after running `vercel link` locally, or Project Settings → General |
+| `VERCEL_PROJECT_ID` | Same as above |
+
+A separate workflow (`.github/workflows/ci.yml`) runs lint + build on every push and pull request as a merge gate.
+
+For a manual/local redeploy (team `m1wav`), you can still run:
 
 ```bash
 npx vercel --prod --scope m1wav
 ```
-
-Connect [m1-k-k/cisco](https://github.com/m1-k-k/cisco) in the [Vercel project settings](https://vercel.com/m1wav/cisco/settings/git) for automatic deploys on push.

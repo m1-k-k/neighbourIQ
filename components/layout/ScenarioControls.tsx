@@ -10,6 +10,7 @@ export function ScenarioControls() {
   const [pulseAdvance, setPulseAdvance] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- deliberate timed pulse on each stage change
     setPulseAdvance(true);
     const t = window.setTimeout(() => setPulseAdvance(false), 2400);
     return () => window.clearTimeout(t);
