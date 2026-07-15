@@ -4,22 +4,23 @@ import { Card } from "@/components/ui/Card";
 import { ConfidenceBadge } from "@/components/ui/ConfidenceBadge";
 import { ExplanationPopover } from "@/components/ui/ExplanationPopover";
 import { RiskBadge } from "@/components/ui/RiskBadge";
-import { getDistrict } from "@/lib/town";
-import { IncidentReading, Prediction } from "@/lib/types";
+import { District, IncidentReading, Prediction } from "@/lib/types";
 
 export function HotspotPanel({
   readings,
   predictions,
   stageKey,
+  getDistrict,
 }: {
   readings: IncidentReading[];
   predictions: Record<string, Prediction>;
   stageKey?: number;
+  getDistrict: (id: string) => District;
 }) {
   return (
     <div className="space-y-4">
       <Card key={`chart-${stageKey ?? 0}`} className="animate-soft-scale-in p-4">
-        <IncidentTrendChart predictions={predictions} />
+        <IncidentTrendChart predictions={predictions} getDistrict={getDistrict} />
       </Card>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {readings.map((reading, i) => {
@@ -42,7 +43,7 @@ export function HotspotPanel({
               </div>
               <dl className="mt-3 grid grid-cols-2 gap-2 text-xs text-ink/80">
                 <div>
-                  <dt className="text-muted">Reports (3h)</dt>
+                  <dt className="text-muted">Reports ({reading.periodLabel ?? "3h"})</dt>
                   <dd className="font-medium">{reading.recentReportCount}</dd>
                 </div>
                 <div>

@@ -4,14 +4,13 @@ import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { TOWN_NAME } from "@/lib/town";
 
-const LINKS = [
-  { href: "/dashboard", label: "Council" },
-  { href: "/resident", label: "Residents" },
-];
+export interface NavLink {
+  href: string;
+  label: string;
+}
 
-export function NavBar() {
+export function NavBar({ links, subtitle }: { links: NavLink[]; subtitle: string }) {
   const pathname = usePathname();
 
   return (
@@ -22,13 +21,11 @@ export function NavBar() {
         </span>
         <span className="leading-tight">
           <span className="block font-display text-lg font-semibold tracking-tight text-white">NeighbourIQ</span>
-          <span className="block text-[11px] font-medium uppercase tracking-wider text-teal-bright/90">
-            {TOWN_NAME} · Live demo
-          </span>
+          <span className="block text-[11px] font-medium uppercase tracking-wider text-teal-bright/90">{subtitle}</span>
         </span>
       </Link>
       <nav className="flex gap-1">
-        {LINKS.map((link) => (
+        {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}

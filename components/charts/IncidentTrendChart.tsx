@@ -2,17 +2,22 @@
 
 import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Prediction } from "@/lib/types";
-import { getDistrict } from "@/lib/town";
+import { District, Prediction } from "@/lib/types";
 
-export function IncidentTrendChart({ predictions }: { predictions: Record<string, Prediction> }) {
+export function IncidentTrendChart({
+  predictions,
+  getDistrict,
+}: {
+  predictions: Record<string, Prediction>;
+  getDistrict: (id: string) => District;
+}) {
   const data = useMemo(
     () =>
       Object.entries(predictions).map(([districtId, prediction]) => ({
         district: getDistrict(districtId).name.split(" ")[0],
         score: prediction.score,
       })),
-    [predictions]
+    [predictions, getDistrict]
   );
 
   return (

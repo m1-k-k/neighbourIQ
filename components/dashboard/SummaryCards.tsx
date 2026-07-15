@@ -1,17 +1,18 @@
 import { AlertOctagon, Landmark, MapPin, Timer } from "lucide-react";
 import { StatTile } from "@/components/ui/StatTile";
 import { DerivedScenario } from "@/lib/derived";
-import { getDistrict } from "@/lib/town";
-import { ScenarioSnapshot } from "@/lib/types";
+import { AlertFeedItem, District } from "@/lib/types";
 
 export function SummaryCards({
-  snapshot,
+  alerts,
   derived,
   stageKey,
+  getDistrict,
 }: {
-  snapshot: ScenarioSnapshot;
+  alerts: AlertFeedItem[];
   derived: DerivedScenario;
   stageKey?: number;
+  getDistrict: (id: string) => District;
 }) {
   const { floodPredictions, trafficPredictions, incidentPredictions, budgetPriorities, combinedRiskByDistrict } = derived;
 
@@ -32,8 +33,8 @@ export function SummaryCards({
   const tiles = [
     {
       label: "Active alerts",
-      value: snapshot.alerts.length,
-      sub: snapshot.alerts.length === 0 ? "All clear" : "Since scenario start",
+      value: alerts.length,
+      sub: alerts.length === 0 ? "All clear" : "Right now",
       icon: AlertOctagon,
     },
     {

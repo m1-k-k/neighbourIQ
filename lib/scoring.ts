@@ -45,7 +45,47 @@ const REROUTE_SUGGESTIONS: Record<string, string> = {
   oldtown: "Consider Greenway Close as an alternate route",
 };
 
+// EA severityLevel: 1=Severe Warning, 2=Warning, 3=Alert, 4=Warning no longer in force
+function severityToScore(severity: number): number {
+  if (severity === 1) return 100;
+  if (severity === 2) return 75;
+  if (severity === 3) return 45;
+  return 10;
+}
+
+function severityLabel(severity: number): string {
+  if (severity === 1) return "Severe flood warning active";
+  if (severity === 2) return "Flood warning active";
+  if (severity === 3) return "Flood alert active";
+  return "No active flood warning";
+}
+
 export function scoreFlood(reading: FloodReading): Prediction {
+  if (reading.floodWarningSeverity !== undefined) {
+    const normRiver =
+      reading.stageTypicalHigh !== undefined &&
+      reading.stageTypicalLow !== undefined &&
+      reading.stageTypicalHigh > reading.stageTypicalLow
+        ? clamp(((reading.riverLevelM - reading.stageTypicalLow) / (reading.stageTypicalHigh - reading.stageTypicalLow)) * 100)
+        : clamp((reading.riverLevelM / 4) * 100);
+    const normRain = clamp((reading.rainfall24hMm / 50) * 100);
+    const severityScore = severityToScore(reading.floodWarningSeverity);
+    const score = Math.round(normRiver * 0.4 + normRain * 0.3 + severityScore * 0.3);
+    const level = levelFromScore(score);
+    const factors: PredictionFactor[] = [
+      { label: "River level", detail: `${reading.riverLevelM.toFixed(2)}m (${reading.trend})`, weight: 0.4 },
+      { label: "24h rainfall", detail: `${reading.rainfall24hMm.toFixed(1)}mm`, weight: 0.3 },
+      { label: "Official flood warning", detail: severityLabel(reading.floodWarningSeverity), weight: 0.3 },
+    ];
+    return {
+      score,
+      level,
+      confidencePct: confidenceFromScore(score),
+      explanation: buildExplanation(level, factors, "River levels and official flood warnings are within normal range."),
+      factors,
+    };
+  }
+
   const normRiver = clamp((reading.riverLevelM / 4) * 100);
   const normRain = clamp((reading.rainfall24hMm / 40) * 100);
   const drainageDeficit = clamp(100 - reading.drainageCapacityPct);
@@ -66,7 +106,9 @@ export function scoreFlood(reading: FloodReading): Prediction {
 }
 
 export function scoreTraffic(reading: TrafficReading): TrafficPrediction {
-  const normSpeedDeficit = clamp(100 - (reading.avgSpeedKmh / 50) * 100);
+  const isLive = reading.freeFlowSpeedKmh !== undefined;
+  const referenceSpeed = isLive ? reading.freeFlowSpeedKmh! : 50;
+  const normSpeedDeficit = clamp(100 - (reading.avgSpeedKmh / referenceSpeed) * 100);
   const incidentBump = reading.incidentOnRoad ? 15 : 0;
   const score = clamp(Math.round(reading.congestionPct * 0.6 + normSpeedDeficit * 0.25 + incidentBump));
   const level = levelFromScore(score);
@@ -75,7 +117,10 @@ export function scoreTraffic(reading: TrafficReading): TrafficPrediction {
     { label: "Average speed", detail: `${reading.avgSpeedKmh} km/h`, weight: 0.25 },
     { label: "Road incidents", detail: reading.incidentOnRoad ? "Closure/incident active" : "None reported", weight: 0.15 },
   ];
-  const predictedDelayMin = Math.round(2 + (score / 100) * 33);
+  const predictedDelayMin =
+    isLive && reading.currentTravelTimeSec !== undefined && reading.freeFlowTravelTimeSec !== undefined
+      ? Math.max(0, Math.round((reading.currentTravelTimeSec - reading.freeFlowTravelTimeSec) / 60))
+      : Math.round(2 + (score / 100) * 33);
   const suggestedReroute =
     level === "High" || level === "Severe" ? REROUTE_SUGGESTIONS[reading.districtId] ?? null : null;
   return {
@@ -89,13 +134,19 @@ export function scoreTraffic(reading: TrafficReading): TrafficPrediction {
   };
 }
 
+const CRIME_COUNT_SOFT_CAP = 100;
+
 export function scoreIncident(reading: IncidentReading): Prediction {
-  const normCount = clamp((reading.recentReportCount / 12) * 100);
+  const normCount =
+    reading.periodLabel !== undefined
+      ? clamp((Math.log10(reading.recentReportCount + 1) / Math.log10(CRIME_COUNT_SOFT_CAP + 1)) * 100)
+      : clamp((reading.recentReportCount / 12) * 100);
   const trendBump = reading.trendDirection === "up" ? 15 : reading.trendDirection === "down" ? -10 : 0;
   const score = clamp(Math.round(normCount + trendBump));
   const level = levelFromScore(score);
+  const periodLabel = reading.periodLabel ?? "last 3h";
   const factors: PredictionFactor[] = [
-    { label: "Recent reports", detail: `${reading.recentReportCount} in last 3h (${reading.category})`, weight: 0.7 },
+    { label: "Recent reports", detail: `${reading.recentReportCount} in ${periodLabel} (${reading.category})`, weight: 0.7 },
     { label: "Trend", detail: reading.trendDirection, weight: 0.3 },
   ];
   return {

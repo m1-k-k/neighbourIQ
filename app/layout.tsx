@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { MobileScenarioBar } from "@/components/layout/MobileScenarioBar";
-import { ScenarioProvider } from "@/lib/ScenarioContext";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -37,10 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fraunces.variable} ${jakarta.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-mist font-sans text-ink">
-        <ScenarioProvider>
-          {children}
-          <MobileScenarioBar />
-        </ScenarioProvider>
+        {children}
         <Analytics />
       </body>
     </html>

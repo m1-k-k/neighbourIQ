@@ -2,17 +2,22 @@
 
 import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { BudgetPriorityItem } from "@/lib/types";
-import { getDistrict } from "@/lib/town";
+import { BudgetPriorityItem, District } from "@/lib/types";
 
-export function BudgetAllocationChart({ items }: { items: BudgetPriorityItem[] }) {
+export function BudgetAllocationChart({
+  items,
+  getDistrict,
+}: {
+  items: BudgetPriorityItem[];
+  getDistrict: (id: string) => District;
+}) {
   const data = useMemo(
     () =>
       items.map((item) => ({
         district: getDistrict(item.districtId).name.split(" ")[0],
         priority: item.priorityScore,
       })),
-    [items]
+    [items, getDistrict]
   );
 
   return (

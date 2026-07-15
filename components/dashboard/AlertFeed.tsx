@@ -1,8 +1,7 @@
 import clsx from "clsx";
 import { AlertOctagon, AlertTriangle, Info } from "lucide-react";
 import { Card } from "@/components/ui/Card";
-import { getDistrict } from "@/lib/town";
-import { AlertFeedItem } from "@/lib/types";
+import { AlertFeedItem, District } from "@/lib/types";
 
 const SEVERITY_STYLES: Record<AlertFeedItem["severity"], { icon: typeof Info; classes: string }> = {
   info: { icon: Info, classes: "bg-teal-muted/60 text-ink border-teal/25" },
@@ -10,7 +9,17 @@ const SEVERITY_STYLES: Record<AlertFeedItem["severity"], { icon: typeof Info; cl
   critical: { icon: AlertOctagon, classes: "bg-red-50 text-red-900 border-red-200" },
 };
 
-export function AlertFeed({ alerts, stageKey }: { alerts: AlertFeedItem[]; stageKey?: number }) {
+export function AlertFeed({
+  alerts,
+  stageKey,
+  getDistrict,
+  emptyMessage,
+}: {
+  alerts: AlertFeedItem[];
+  stageKey?: number;
+  getDistrict: (id: string) => District;
+  emptyMessage?: string;
+}) {
   const sorted = [...alerts].reverse();
 
   return (
@@ -24,10 +33,10 @@ export function AlertFeed({ alerts, stageKey }: { alerts: AlertFeedItem[]; stage
           {sorted.length} alert{sorted.length === 1 ? "" : "s"}
         </span>
       </div>
-      <p className="mb-3 text-xs text-muted">NeighbourIQ responses as the scenario unfolds</p>
+      <p className="mb-3 text-xs text-muted">NeighbourIQ responses as conditions change</p>
       {sorted.length === 0 ? (
         <p className="animate-fade-in rounded-lg border border-dashed border-border bg-mist px-3 py-6 text-center text-xs text-muted">
-          No alerts yet — advance the story to see NeighbourIQ respond.
+          {emptyMessage ?? "No alerts right now."}
         </p>
       ) : (
         <ul className="space-y-2.5" key={stageKey}>

@@ -1,6 +1,5 @@
 import clsx from "clsx";
-import { getDistrict } from "@/lib/town";
-import { VulnerableResident } from "@/lib/types";
+import { District, VulnerableResident } from "@/lib/types";
 
 const STATUS_STYLES: Record<VulnerableResident["alertStatus"], string> = {
   none: "bg-mist text-muted border-border",
@@ -14,7 +13,13 @@ const STATUS_LABEL: Record<VulnerableResident["alertStatus"], string> = {
   alerted: "Alerted",
 };
 
-export function ResidentAlertCard({ resident }: { resident: VulnerableResident }) {
+export function ResidentAlertCard({
+  resident,
+  getDistrict,
+}: {
+  resident: VulnerableResident;
+  getDistrict: (id: string) => District;
+}) {
   const district = getDistrict(resident.districtId);
   const isAlerted = resident.alertStatus === "alerted";
 

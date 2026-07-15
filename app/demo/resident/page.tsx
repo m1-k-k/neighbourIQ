@@ -2,18 +2,25 @@
 
 import { CloudRain, HeartHandshake, ShieldAlert } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { ScenarioControls } from "@/components/layout/ScenarioControls";
 import { ResidentAlertCard } from "@/components/resident/ResidentAlertCard";
 import { Card } from "@/components/ui/Card";
 import { useScenario } from "@/lib/ScenarioContext";
+import { getDistrict, TOWN_NAME } from "@/lib/town";
 
-export default function ResidentPage() {
+const NAV_LINKS = [
+  { href: "/demo/dashboard", label: "Council" },
+  { href: "/demo/resident", label: "Residents" },
+];
+
+export default function DemoResidentPage() {
   const { snapshot, stageIndex } = useScenario();
   const { weather, vulnerableResidents } = snapshot;
   const atRisk = vulnerableResidents.filter((r) => r.alertStatus !== "none");
 
   return (
     <div className="flex min-h-dvh min-h-screen min-w-0 flex-col overflow-x-clip bg-civic-mist">
-      <AppHeader />
+      <AppHeader links={NAV_LINKS} subtitle={`${TOWN_NAME} · Live demo`} controls={<ScenarioControls />} />
       <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-6 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:px-6 md:py-8 md:pb-8">
         <div className="animate-fade-up">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-teal">People first</p>
@@ -55,12 +62,8 @@ export default function ResidentPage() {
           ) : (
             <div key={`alerts-${stageIndex}`} className="grid gap-3 sm:grid-cols-2">
               {atRisk.map((resident, i) => (
-                <div
-                  key={resident.id}
-                  className="animate-soft-scale-in"
-                  style={{ animationDelay: `${i * 90}ms` }}
-                >
-                  <ResidentAlertCard resident={resident} />
+                <div key={resident.id} className="animate-soft-scale-in" style={{ animationDelay: `${i * 90}ms` }}>
+                  <ResidentAlertCard resident={resident} getDistrict={getDistrict} />
                 </div>
               ))}
             </div>

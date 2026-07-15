@@ -1,23 +1,25 @@
 "use client";
 
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { Droplets } from "lucide-react";
-import { RiskTrendChart } from "@/components/charts/RiskTrendChart";
 import { Card } from "@/components/ui/Card";
 import { ConfidenceBadge } from "@/components/ui/ConfidenceBadge";
 import { ExplanationPopover } from "@/components/ui/ExplanationPopover";
 import { RiskBadge } from "@/components/ui/RiskBadge";
-import { getDistrict } from "@/lib/town";
-import { FloodReading, Prediction } from "@/lib/types";
+import { District, FloodReading, Prediction } from "@/lib/types";
 
 export function FloodRiskPanel({
   readings,
   predictions,
   stageKey,
+  getDistrict,
+  renderTrendChart,
 }: {
   readings: FloodReading[];
   predictions: Record<string, Prediction>;
   stageKey?: number;
+  getDistrict: (id: string) => District;
+  renderTrendChart: (focusDistrictId: string) => ReactNode;
 }) {
   const topDistrictId = useMemo(
     () =>
@@ -30,7 +32,7 @@ export function FloodRiskPanel({
   return (
     <div className="space-y-4">
       <Card key={`chart-${stageKey ?? 0}`} className="animate-soft-scale-in p-4">
-        <RiskTrendChart focusDistrictId={topDistrictId} />
+        {renderTrendChart(topDistrictId)}
       </Card>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {readings.map((reading, i) => {
@@ -61,8 +63,14 @@ export function FloodRiskPanel({
                   <dd className="font-medium">{reading.rainfall24hMm}mm</dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Drainage</dt>
-                  <dd className="font-medium">{reading.drainageCapacityPct}%</dd>
+                  <dt className="text-muted">{reading.floodWarningSeverity !== undefined ? "Flood warning" : "Drainage"}</dt>
+                  <dd className="font-medium">
+                    {reading.floodWarningSeverity !== undefined
+                      ? reading.floodWarningSeverity <= 2
+                        ? "Active"
+                        : "None"
+                      : `${reading.drainageCapacityPct}%`}
+                  </dd>
                 </div>
               </dl>
               <div className="mt-3 flex items-center justify-between">

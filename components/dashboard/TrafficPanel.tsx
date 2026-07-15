@@ -4,22 +4,23 @@ import { Card } from "@/components/ui/Card";
 import { ConfidenceBadge } from "@/components/ui/ConfidenceBadge";
 import { ExplanationPopover } from "@/components/ui/ExplanationPopover";
 import { RiskBadge } from "@/components/ui/RiskBadge";
-import { getDistrict } from "@/lib/town";
-import { TrafficPrediction, TrafficReading } from "@/lib/types";
+import { District, TrafficPrediction, TrafficReading } from "@/lib/types";
 
 export function TrafficPanel({
   readings,
   predictions,
   stageKey,
+  getDistrict,
 }: {
   readings: TrafficReading[];
   predictions: Record<string, TrafficPrediction>;
   stageKey?: number;
+  getDistrict: (id: string) => District;
 }) {
   return (
     <div className="space-y-4">
       <Card key={`chart-${stageKey ?? 0}`} className="animate-soft-scale-in p-4">
-        <TrafficCongestionChart readings={readings} />
+        <TrafficCongestionChart readings={readings} getDistrict={getDistrict} />
       </Card>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {readings.map((reading, i) => {

@@ -1,15 +1,13 @@
-import { NavBar } from "./NavBar";
-import { ScenarioControls } from "./ScenarioControls";
+import { ReactNode } from "react";
+import { NavBar, NavLink } from "./NavBar";
 
-export function AppHeader() {
+export function AppHeader({ links, subtitle, controls }: { links: NavLink[]; subtitle: string; controls: ReactNode }) {
   return (
     <>
       <div className="sticky top-0 z-30">
-        <NavBar />
+        <NavBar links={links} subtitle={subtitle} />
       </div>
-      <div className="md:sticky md:top-[3.75rem] md:z-20">
-        <ScenarioControls />
-      </div>
+      <div className="md:sticky md:top-[3.75rem] md:z-20">{controls}</div>
     </>
   );
 }

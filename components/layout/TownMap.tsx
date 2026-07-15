@@ -45,7 +45,7 @@ export const TownMap = memo(function TownMap({
         />
         {DISTRICTS.map((district, i) => {
           const level = combinedRiskByDistrict[district.id] ?? "Low";
-          const { x, y, width, height } = district.rect;
+          const { x, y, width, height } = district.rect!;
           const color = RISK_FILL_COLORS[level];
           const cx = x + width / 2;
           const cy = y + height / 2;

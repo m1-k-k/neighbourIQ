@@ -1,11 +1,10 @@
-import { ArrowRight, Users } from "lucide-react";
+import { ArrowRight, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
-import { TOWN_NAME } from "@/lib/town";
 
 export default function HomePage() {
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-civic-ink text-white">
-      {/* Full-bleed Millhaven map silhouette */}
+      {/* Full-bleed map silhouette */}
       <svg
         className="animate-map-drift animate-ambient-breathe pointer-events-none absolute inset-[-4%] h-[108%] w-[108%] text-white"
         viewBox="0 0 800 600"
@@ -25,6 +24,14 @@ export default function HomePage() {
         />
       </svg>
 
+      <Link
+        href="/demo/dashboard"
+        className="hover-lift group fixed right-4 top-4 z-20 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-2 text-xs font-semibold text-white backdrop-blur-sm hover:bg-white/20 sm:right-6 sm:top-6"
+        data-testid="scripted-demo-link"
+      >
+        <Sparkles size={13} className="text-amber" /> Try the scripted demo
+      </Link>
+
       <div className="relative z-10 flex flex-1 flex-col justify-center px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto w-full max-w-3xl">
           <p className="animate-fade-up font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
@@ -38,8 +45,8 @@ export default function HomePage() {
             Councils spend millions reacting after the damage is done.
           </h1>
           <p className="animate-fade-up-delay-2 mt-4 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">
-            NeighbourIQ predicts flood, traffic, and incident risk across {TOWN_NAME} — so you can protect people
-            before crises escalate.
+            NeighbourIQ predicts flood, traffic, and incident risk for any real UK place — search a postcode or town
+            to see live conditions, so you can protect people before crises escalate.
           </p>
 
           <div className="animate-fade-up-delay-3 mt-10 flex flex-wrap items-center gap-3">
@@ -47,7 +54,7 @@ export default function HomePage() {
               href="/dashboard"
               className="hover-lift inline-flex items-center gap-2 rounded-lg bg-amber px-6 py-3.5 text-sm font-semibold text-ink shadow-lg shadow-amber/20 hover:shadow-xl hover:shadow-amber/30"
             >
-              Launch {TOWN_NAME} live demo <ArrowRight size={16} />
+              Search a real place <ArrowRight size={16} />
             </Link>
             <Link
               href="/resident"
@@ -66,7 +73,7 @@ export default function HomePage() {
       <section className="relative z-10 border-t border-white/10 bg-black/20 px-6 py-10 backdrop-blur-sm sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-3">
           {[
-            { title: "See it coming", body: "Flood, congestion, and hotspot risk scored live across six districts." },
+            { title: "See it coming", body: "Flood, congestion, and hotspot risk scored live across six sample points near any UK place." },
             { title: "Act in time", body: "Budget priorities and reroutes surface before the emergency call." },
             { title: "Protect people", body: "Vulnerable residents get personalised alerts when risk spikes." },
           ].map((item, i) => (

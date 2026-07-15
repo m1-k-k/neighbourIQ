@@ -2,17 +2,22 @@
 
 import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { TrafficReading } from "@/lib/types";
-import { getDistrict } from "@/lib/town";
+import { District, TrafficReading } from "@/lib/types";
 
-export function TrafficCongestionChart({ readings }: { readings: TrafficReading[] }) {
+export function TrafficCongestionChart({
+  readings,
+  getDistrict,
+}: {
+  readings: TrafficReading[];
+  getDistrict: (id: string) => District;
+}) {
   const data = useMemo(
     () =>
       readings.map((r) => ({
         district: getDistrict(r.districtId).name.split(" ")[0],
         congestion: r.congestionPct,
       })),
-    [readings]
+    [readings, getDistrict]
   );
 
   return (

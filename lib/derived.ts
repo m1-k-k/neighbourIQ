@@ -1,7 +1,7 @@
 import { getSnapshot, TOTAL_STAGES } from "./scenario";
 import { DISTRICTS } from "./town";
 import { computeBudgetPriorities, scoreFlood, scoreIncident, scoreTraffic } from "./scoring";
-import { Prediction, RiskLevel, ScenarioSnapshot, TrafficPrediction } from "./types";
+import { District, FloodReading, IncidentReading, Prediction, RiskLevel, TrafficPrediction, TrafficReading } from "./types";
 
 const LEVEL_RANK: Record<RiskLevel, number> = { Low: 0, Medium: 1, High: 2, Severe: 3 };
 
@@ -17,20 +17,43 @@ export interface DerivedScenario {
   combinedRiskByDistrict: Record<string, RiskLevel>;
 }
 
-export function computeDerived(snapshot: ScenarioSnapshot): DerivedScenario {
+interface ReadingsSource {
+  floodReadings: FloodReading[];
+  trafficReadings: TrafficReading[];
+  incidentReadings: IncidentReading[];
+}
+
+// Live mode's generated sectors have no REROUTE_SUGGESTIONS entry in scoring.ts (that map only
+// covers the demo's 3 fixed district ids), so scoreTraffic naturally returns null for them —
+// this fills that gap by suggesting whichever sector currently has the lowest congestion.
+function applyLiveRerouteSuggestions(readings: TrafficReading[], districts: District[], predictions: Record<string, TrafficPrediction>): void {
+  if (readings.length === 0) return;
+  const byId = new Map(districts.map((d) => [d.id, d]));
+  const leastCongested = [...readings].sort((a, b) => a.congestionPct - b.congestionPct)[0];
+  for (const reading of readings) {
+    const prediction = predictions[reading.districtId];
+    if (prediction.suggestedReroute !== null) continue;
+    if ((prediction.level !== "High" && prediction.level !== "Severe") || reading.districtId === leastCongested.districtId) continue;
+    const altDistrict = byId.get(leastCongested.districtId);
+    if (altDistrict) prediction.suggestedReroute = `Congestion is lower via the ${altDistrict.name} approach — consider that route`;
+  }
+}
+
+export function computeDerived(snapshot: ReadingsSource, districts: District[] = DISTRICTS): DerivedScenario {
   const floodPredictions: Record<string, Prediction> = {};
   for (const reading of snapshot.floodReadings) floodPredictions[reading.districtId] = scoreFlood(reading);
 
   const trafficPredictions: Record<string, TrafficPrediction> = {};
   for (const reading of snapshot.trafficReadings) trafficPredictions[reading.districtId] = scoreTraffic(reading);
+  applyLiveRerouteSuggestions(snapshot.trafficReadings, districts, trafficPredictions);
 
   const incidentPredictions: Record<string, Prediction> = {};
   for (const reading of snapshot.incidentReadings) incidentPredictions[reading.districtId] = scoreIncident(reading);
 
-  const budgetPriorities = computeBudgetPriorities(DISTRICTS, floodPredictions, trafficPredictions, incidentPredictions);
+  const budgetPriorities = computeBudgetPriorities(districts, floodPredictions, trafficPredictions, incidentPredictions);
 
   const combinedRiskByDistrict: Record<string, RiskLevel> = {};
-  for (const district of DISTRICTS) {
+  for (const district of districts) {
     combinedRiskByDistrict[district.id] = worstLevel([
       floodPredictions[district.id].level,
       trafficPredictions[district.id].level,

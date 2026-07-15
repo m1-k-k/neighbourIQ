@@ -1,14 +1,27 @@
 import { Landmark } from "lucide-react";
 import { BudgetAllocationChart } from "@/components/charts/BudgetAllocationChart";
 import { Card } from "@/components/ui/Card";
-import { getDistrict } from "@/lib/town";
-import { BudgetPriorityItem } from "@/lib/types";
+import { SyntheticDataBadge } from "@/components/ui/SyntheticDataBadge";
+import { BudgetPriorityItem, District } from "@/lib/types";
 
-export function BudgetPriorityPanel({ items, stageKey }: { items: BudgetPriorityItem[]; stageKey?: number }) {
+export function BudgetPriorityPanel({
+  items,
+  stageKey,
+  getDistrict,
+  showSyntheticNotice,
+}: {
+  items: BudgetPriorityItem[];
+  stageKey?: number;
+  getDistrict: (id: string) => District;
+  showSyntheticNotice?: boolean;
+}) {
   return (
     <div className="space-y-4">
+      {showSyntheticNotice && (
+        <SyntheticDataBadge label="Vulnerability weighting (15% of each priority score) uses illustrative sample data, not real resident records — flood, traffic, and incident factors are real." />
+      )}
       <Card key={`chart-${stageKey ?? 0}`} className="animate-soft-scale-in p-4">
-        <BudgetAllocationChart items={items} />
+        <BudgetAllocationChart items={items} getDistrict={getDistrict} />
       </Card>
       <div className="space-y-2">
         {items.map((item, i) => {
