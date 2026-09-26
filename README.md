@@ -1,71 +1,126 @@
-# NeighbourIQ — AI Community Guardian
+# NeighbourIQ
 
-Council and resident dashboards for flood, traffic, incident hotspot, and budget-priority risk, driven by a transparent rules-based predictive engine.
+A civic-data dashboard prototype that brings flood, weather, traffic, and crime information into council and resident views. Search a UK location, inspect mapped monitoring points, and explore how transparent scoring rules turn the available inputs into risk indicators and illustrative budget priorities.
 
-- **`/dashboard` and `/resident`** — search any real UK postcode or place and see live conditions: real flood risk (Environment Agency), real crime/incident data (data.police.uk), real weather (Open-Meteo), and real traffic (TomTom, if configured). Vulnerable-resident and budget-priority panels blend in clearly-labeled illustrative sample data, since no public source exists for that.
-- **`/demo/dashboard` and `/demo/resident`** — the original scripted pitch demo for the fictional town of Millhaven: a manually-advanced five-stage story (calm day → storm → flood → incidents → council response), unchanged. Reachable from a corner button on the front page.
+NeighbourIQ also includes a separate, scripted demonstration for the fictional town of Millhaven. Its prediction engine is implemented as weighted rules in TypeScript; there is no trained machine-learning model.
 
-## Stack
+[Hosted application](https://cisco-livid.vercel.app) · [Source repository](https://github.com/m1-k-k/neighbourIQ)
 
-- Next.js 16 (App Router)
-- React 19
-- Tailwind CSS 4
-- Recharts, react-leaflet (live map)
+## Explore the application
 
-## Getting started
+| Route | Experience |
+| --- | --- |
+| `/dashboard` | Location search, map, flood/traffic/incident panels, alerts, and budget priorities |
+| `/resident` | Resident-facing view combining area indicators with labelled sample residents |
+| `/demo/dashboard` | Council dashboard for the manually advanced Millhaven scenario |
+| `/demo/resident` | Resident view for the same scripted scenario |
+
+The demo progresses through five stages: a calm day, a storm, flooding, incidents, and a council response. It provides a repeatable presentation without depending on live source readings.
+
+## Run locally
+
+Use **Node.js 22.13 or newer in the 22.x series, or Node.js 24+**, and npm. These versions satisfy the checked-in framework and lint-tool dependencies.
 
 ```bash
-npm install
-cp .env.example .env.local   # optional: add TOMTOM_API_KEY for live traffic data
+git clone https://github.com/m1-k-k/neighbourIQ.git
+cd neighbourIQ
+npm ci
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) locally, or the live demo at [https://cisco-livid.vercel.app](https://cisco-livid.vercel.app).
+Open [localhost:3000](http://localhost:3000). You can use the application without an API key. Traffic readings require the optional TomTom configuration.
 
-### Real data sources (live mode)
+To enable traffic, copy [.env.example](.env.example) to `.env.local`:
 
-| Source | Provider | Key required? | Coverage |
-|---|---|---|---|
-| Flood risk | [Environment Agency flood-monitoring API](https://environment.data.gov.uk/flood-monitoring/doc/reference) | No | England only |
-| Crime/incidents | [data.police.uk](https://data.police.uk/docs/) | No | England, Wales, Northern Ireland |
-| Weather | [Open-Meteo](https://open-meteo.com/) | No | UK-wide |
-| Traffic | [TomTom Traffic API](https://developer.tomtom.com/) | **Yes** — `TOMTOM_API_KEY` | UK-wide |
-| Geocoding | [postcodes.io](https://postcodes.io/) + [Nominatim](https://nominatim.org/) | No | UK-wide |
+```bash
+# macOS / Linux
+cp .env.example .env.local
+```
 
-Areas outside England (flood) or Scotland (crime) show a clear "not available" state instead of an error. Without `TOMTOM_API_KEY`, everything else still works; traffic just shows as unconfigured.
+```powershell
+# Windows PowerShell
+Copy-Item .env.example .env.local
+```
 
-## Scripts
+Set `TOMTOM_API_KEY` to your own key and restart the development server. This is a server-side secret; do not prefix it with `NEXT_PUBLIC_`.
 
-| Command        | Description              |
-|----------------|--------------------------|
-| `npm run dev`  | Start development server |
-| `npm run build`| Production build         |
-| `npm run start`| Serve production build   |
-| `npm run lint` | Run ESLint               |
+## Data sources and freshness
+
+“Live mode” means the app fetches from external providers when you search or refresh. It does not mean every dataset is real-time or continuously streamed.
+
+| Input | Adapter | How the repository uses it |
+| --- | --- | --- |
+| Location search | [postcodes.io](https://postcodes.io/), then [Nominatim](https://nominatim.org/) | Resolves postcodes and place names; requests are cached for 24 hours |
+| Flood | [Environment Agency flood-monitoring API](https://environment.data.gov.uk/flood-monitoring/doc/reference) | Searches for a nearby level station and active warnings; requests are cached for 15 minutes |
+| Weather | [Open-Meteo](https://open-meteo.com/) | Fetches current weather and hourly precipitation; requests are cached for 10 minutes |
+| Crime | [data.police.uk](https://data.police.uk/docs/) | Compares the latest published month with the preceding month; requests are cached for 6 hours |
+| Traffic | [TomTom](https://developer.tomtom.com/) Flow Segment Data | Samples road flow near each monitoring point; requests are cached for 2 minutes and require a key |
+
+The Environment Agency integration is intended for England. Crime availability depends on the provider's published area and month coverage. Empty or failed source responses are not evidence that an area has no incidents or risks.
+
+## How the dashboard is built
+
+1. A location query is resolved to coordinates.
+2. [lib/geo.ts](lib/geo.ts) creates six sample monitoring points approximately 1.5 km around the centre. They are directional sample sectors, not official administrative boundaries.
+3. [app/api/location-data/route.ts](app/api/location-data/route.ts) collects the source readings and adds deterministic sample resident records.
+4. [lib/scoring.ts](lib/scoring.ts) calculates scores, categories, explanations, and illustrative budget priorities.
+5. [lib/LocationContext.tsx](lib/LocationContext.tsx) shares the snapshot with the map, charts, dashboard, and resident view.
+
+The scoring functions use explicit weights. For example, live flood scoring combines river level (40%), rainfall (30%), and warning severity (30%). Budget priority combines flood (40%), traffic (25%), incidents (20%), and a synthetic resident-vulnerability factor (15%). These are project rules that can be inspected and changed in the source.
+
+## Interpreting the results
+
+- **Risk and confidence are computed indicators.** Confidence percentages are derived from the score, not calibrated statistical confidence or independently validated forecast accuracy.
+- **Resident records and vulnerability counts are synthetic.** Names, age bands, and risk factors demonstrate the interface and do not represent real people.
+- **Budget values are illustrative.** Rankings, recommended actions, and estimated costs are generated by formulas, not council budgets or procurement estimates.
+- **Flood measurements are shared across sectors.** The selected nearby station and warning context are reused for the location's six sample points.
+- **Source failures can produce fallback values.** The app exposes coverage/configuration flags, but some empty provider responses also become zero/default readings. Check source availability before interpreting scores.
+- **Alerts are on-screen output.** The resident “alerted” state is calculated for the demonstration; the repository does not send SMS, email, or emergency notifications.
+
+The application is intended for exploring data integration and explainable decision-support interfaces. Its scores are not an operational emergency-management or public-safety service.
+
+## Development
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start development server |
+| `npm run lint` | Run ESLint |
+| `npm run build` | Create production build |
+| `npm run start` | Serve production build |
+
+```text
+app/
+  (live)/                 Location-driven council and resident pages
+  demo/                   Scripted Millhaven demonstration
+  api/                    Geocoding and location snapshot endpoints
+components/
+  charts/                 Recharts visualisations
+  dashboard/              Risk, alert, and budget panels
+  layout/                 Maps, navigation, and search controls
+  resident/               Resident cards
+lib/
+  sources/                Flood, weather, crime, and traffic adapters
+  scoring.ts              Weighted scoring and budget rules
+  derived.ts              Shared derived indicators
+  geo.ts                  Sample monitoring-point geometry
+  syntheticResidents.ts   Illustrative resident data
+  scenario.ts             Scripted demo stages
+```
+
+The stack is Next.js 16, React 19, TypeScript, Tailwind CSS 4, Recharts, Leaflet, and React Leaflet. The repository includes lint/build CI, but no automated test suite.
 
 ## Deployment
 
-Hosted on [Vercel](https://vercel.com). Production URL: **https://cisco-livid.vercel.app**
+[.github/workflows/deploy.yml](.github/workflows/deploy.yml) is configured to deploy to Vercel on pushes to `master`. It installs dependencies, pulls the Vercel configuration, builds for production, and deploys the prebuilt output.
 
-Source of truth is [m1-k-k/neighbourIQ](https://github.com/m1-k-k/neighbourIQ). Deploys to production run automatically via GitHub Actions (`.github/workflows/deploy.yml`) on every push to `master`:
+The workflow requires these GitHub Actions secrets:
 
-1. `npm ci`
-2. `vercel pull` / `vercel build --prod` / `vercel deploy --prebuilt --prod`
+| Secret | Purpose |
+| --- | --- |
+| `VERCEL_TOKEN` | Authorises the Vercel CLI |
+| `VERCEL_ORG_ID` | Identifies the Vercel account/team |
+| `VERCEL_PROJECT_ID` | Identifies the linked Vercel project |
 
-This requires three repository secrets to be set under **Settings → Secrets and variables → Actions**:
+Add `TOMTOM_API_KEY` separately to the Vercel project's environment variables for production traffic readings. After linking the intended project locally, a manual deployment can use `npx vercel --prod`.
 
-| Secret | Where to get it |
-|---|---|
-| `VERCEL_TOKEN` | Create at [vercel.com/account/tokens](https://vercel.com/account/tokens) |
-| `VERCEL_ORG_ID` | From `.vercel/project.json` after running `vercel link` locally, or Project Settings → General |
-| `VERCEL_PROJECT_ID` | Same as above |
-
-A separate workflow (`.github/workflows/ci.yml`) runs lint + build on every push and pull request as a merge gate.
-
-For live traffic data in production, also add `TOMTOM_API_KEY` under the Vercel project's **Environment Variables** (Project Settings → Environment Variables) — this is a runtime secret read by the `/api/location-data` route on each request, separate from the GitHub Actions secrets above.
-
-For a manual/local redeploy (team `m1wav`), you can still run:
-
-```bash
-npx vercel --prod --scope m1wav
-```
+[.github/workflows/ci.yml](.github/workflows/ci.yml) runs lint and build on pushes and pull requests. Both workflows currently select Node 20; the deployment workflow runs independently of CI, and whether CI is a required merge check depends on repository settings.
